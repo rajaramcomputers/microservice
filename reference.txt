@@ -1,2 +1,6 @@
+1.
+
+Based on the video, the file main_video1.go is created
+-----
 2. Introduction to Microservice Continued
 https://www.youtube.com/watch?v=hodOppKJm5Y
