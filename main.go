@@ -1,26 +1,49 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
+	"context"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"time"
+
+	"rajaramsystems.com/microservice/handlers/handlers"
 )
 
 func main() {
-	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
-		log.Println("Hello Ram")
-		d, err := ioutil.ReadAll(r.Body)
-		if err != nil{
-			http.Error(rw, "error", http.StatusBadRequest)
-			return
-		}
-		fmt.Fprintf(rw, "Data %s\n", d)
-	})
-	http.HandleFunc("/goodbye", func(http.ResponseWriter, *http.Request) {
-		log.Println("Good Bye Ram")
-	})
+	l := log.New(os.Stdout, "product-api", log.LstdFlags)
+	hh := handlers.NewHello(l)
+	gh := handlers.NewGoodbye(l)
+	//this handler was created by Dr Ram
+	homeh := handlers.NewHome(l)
 
-	http.ListenAndServe(":9090", nil)
+	sm := http.NewServeMux()
+	sm.Handle("/", hh)
+	sm.Handle("/goodbye", gh)
+	sm.Handle("/home", homeh)
+
+	s := &http.Server{
+		Addr:         ":9090",
+		Handler:      sm,
+		IdleTimeout:  120 * time.Second,
+		ReadTimeout:  1 * time.Second,
+		WriteTimeout: 1 * time.Second,
+	}
+	go func() {
+		err := s.ListenAndServe()
+		if err != nil {
+			l.Fatal(err)
+		}
+	}()
+
+	sigChan := make(chan os.Signal)
+	signal.Notify(sigChan, os.Interrupt)
+	signal.Notify(sigChan, os.Kill)
+	sig := <-sigChan
+	l.Println("Retreived terminate, graceful shutdown", sig)
+	tc, _ := context.WithTimeout(context.Background(), 30*time.Second)
+
+	s.Shutdown(tc)
 
 }
