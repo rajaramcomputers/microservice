@@ -24,6 +24,7 @@ func main() {
 	//from the lecture with respect to product handler
 
 	ph := handlers.NewProducts(l)
+	goh := handlers.NewGoals(l)
 
 	sm := http.NewServeMux()
 	sm.Handle("/", hh)
@@ -31,6 +32,7 @@ func main() {
 	sm.Handle("/home", homeh)
 	sm.Handle("/contact", ch)
 	sm.Handle("/products", ph)
+	sm.Handle("/goals", goh)
 	s := &http.Server{
 		Addr:         ":9090",
 		Handler:      sm,
