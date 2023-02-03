@@ -14,5 +14,5 @@ func NewHome(l *log.Logger) *Home {
 }
 
 func (g *Home) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	rw.Write([]byte("From Home"))
+	rw.Write([]byte("From Home\n"))
 }

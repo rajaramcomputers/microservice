@@ -15,14 +15,22 @@ func main() {
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
 	hh := handlers.NewHello(l)
 	gh := handlers.NewGoodbye(l)
+
 	//this handler was created by Dr Ram
 	homeh := handlers.NewHome(l)
+	ch := handlers.NewContact(l)
+	//
+
+	//from the lecture with respect to product handler
+
+	ph := handlers.NewProducts(l)
 
 	sm := http.NewServeMux()
 	sm.Handle("/", hh)
 	sm.Handle("/goodbye", gh)
 	sm.Handle("/home", homeh)
-
+	sm.Handle("/contact", ch)
+	sm.Handle("/products", ph)
 	s := &http.Server{
 		Addr:         ":9090",
 		Handler:      sm,
