@@ -28,12 +28,18 @@ func main() {
 	//goh := handlers.NewGoals(l)
 
 	sm := mux.NewRouter()
-	sm.Handle("/", ph)
-	//sm.Handle("/goodbye", gh)
-	//sm.Handle("/home", homeh)
-	//sm.Handle("/contact", ch)
-	//sm.Handle("/products", ph)
-	//sm.Handle("/goals", goh)
+
+	getRouter := sm.Methods("GET").Subrouter()
+	getRouter.HandleFunc("/", ph.GetProducts)
+
+	putRouter := sm.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/{id:[0-9]+}", ph.UpdateProducts)
+	putRouter.Use(ph.MiddlewareProductValidation)
+
+	postRouter := sm.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/", ph.AddProducts)
+	postRouter.Use(ph.MiddlewareProductValidation)
+
 	s := &http.Server{
 		Addr:         ":9090",
 		Handler:      sm,
